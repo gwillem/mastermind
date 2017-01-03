@@ -4,6 +4,8 @@ from strategies import BasicExclusionStrategy
 from game import Game, WIDTH
 
 
+LEFTPADDED = 10 
+
 class Colors:
 
     @staticmethod
@@ -15,6 +17,19 @@ class Colors:
         return "\033[1;37;1m{}\033[0m".format(s)
 
 
+def show_turn(i, combo, red, white):
+
+    r = Colors.Red("{} red".format(red)) if red else "     "
+    a = ", " if (red and white) else "  "
+    w = Colors.White("{} white".format(white)) if white else "     "
+    score = r+a+w
+
+
+    print(("{:2d}."+" "*(LEFTPADDED-3)+"{}        {:<80}\n").format(
+        i, combo, score
+    ))
+
+
 if __name__ == '__main__':
     game = Game()
     print("Game started!\n")
@@ -23,16 +38,6 @@ if __name__ == '__main__':
 
     s = BasicExclusionStrategy(game=game)
 
-    def show_turn(i, combo, red, white):
 
-        r = Colors.Red("{} red".format(red)) if red else "     "
-        a = ", " if (red and white) else "  "
-        w = Colors.White("{} white".format(white)) if white else "     "
-        score = r+a+w
-
-
-        print("{:2d}.{}\t{}".format(
-            i, combo, score
-        ))
 
     s.fullgame(turn_cb=show_turn)
