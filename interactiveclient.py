@@ -68,10 +68,8 @@ def read_guess():
 
 if __name__ == '__main__':
 
-    combo = Combo()
-
-
     while True:
+        combo = Combo()
         game = Game(combo)
 
         print("We gaan beginnen!\n")

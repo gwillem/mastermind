@@ -1,8 +1,8 @@
-import unittest
-from game import Combo, Game
+from unittest import TestCase
+from game import Combo, Game, tuple_intersection, tuple_match
 
-class TestMasterMind(unittest.TestCase):
 
+class TestMasterMind(TestCase):
 
     def _assert_compare(self, a, b, red, white):
 
@@ -35,3 +35,25 @@ class TestMasterMind(unittest.TestCase):
 
     def test_compare_zero_index(self):
         self._assert_compare((0, 8, 2, 2), (6, 7, 3, 0), 0, 1)
+
+
+class TestMasterMindHelpers(TestCase):
+
+    def test_tuple_intersection(self):
+
+        i = tuple_intersection((1,2,3,4), (3,4,5,6))
+        self.assertEqual(i, 2)
+
+    def test_tuple_match_fails_wrong_size(self):
+
+        with self.assertRaises(AssertionError):
+            i = tuple_match((1,2,3,4), (3,4,5,6, 7))
+
+    def test_tuple_match_no_match(self):
+
+        i = tuple_match((1,2,3,4), (3,4,5,6))
+        self.assertEqual(i, 0)
+
+    def test_tuple_match(self):
+        i = tuple_match((1,2,3,4), (1,4,5,6))
+        self.assertEqual(i, 1)

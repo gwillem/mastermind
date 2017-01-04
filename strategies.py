@@ -2,7 +2,8 @@
 
 import random
 from statistics import mean
-from game import Game, Combo
+from game import Game, Combo, tuple_intersection, tuple_match, \
+    permute
 
 
 def choice(i):
@@ -99,28 +100,22 @@ class BasicExclusionStrategy(Strategy):
 
     def next_guess(self):
 
-        i = 0 
-        while True:
-            i += 1
-
-            # if i % 10000 == 0:
-            #     print("Oops, {} tries for a new guess".format(i))
-
-
-            if self.known_colors:
+        if self.known_colors:
+            while True:
                 seq = list(self.known_colors)
                 random.shuffle(seq)
                 seq = tuple(seq)
-            else:
-                seq = tuple(
-                    choice(self.choices_per_pin[p]) 
-                    for p in self.game.pinidx
-                )
+                if seq not in self.history and self.honors_history(seq):
+                    break
+        else:
 
-            if seq not in self.history and self.honors_history(seq):
-                # if i > 1000:
-                #     print("oops, had to try {} times before i found a unique possibility".format(i))
-                return Combo(seq)
+            mygen = permute([self.choices_per_pin[i] for i in sorted(self.choices_per_pin)])
+            for seq in map(tuple, mygen):
+                if seq not in self.history and self.honors_history(seq):
+                    seq = tuple(seq)
+                    break
+
+        return Combo(seq)
 
     def honors_history(self, proposed):
         # does proposed seq comply with all previous turns?
@@ -135,36 +130,14 @@ class BasicExclusionStrategy(Strategy):
     def valid_turn(self, previous, red, white, proposed):
         # check whether exactly red+white colors are the same
         # samecolors = red + white
-        if self.tuple_intersection(previous, proposed) != red + white:
+        if tuple_intersection(previous, proposed) != red + white:
             return False
 
         # check whether at least red colors are on the same pin
-        if self.tuple_match(previous, proposed) != red:
+        if tuple_match(previous, proposed) != red:
             return False
 
         return True
-
-    @staticmethod
-    def tuple_intersection(t1, t2):
-        i = 0        
-        t2 = list(t2)
-        for x in t1:
-            if x in t2:
-                t2.remove(x)
-                i += 1
-
-        return i 
-
-    @staticmethod
-    def tuple_match(t1, t2):
-        assert len(t1) == len(t2)
-
-        found = 0
-        for i, v in enumerate(t1):
-            if t2[i] == v:
-                found += 1
-
-        return found
 
 
 def main():

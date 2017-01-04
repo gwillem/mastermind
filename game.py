@@ -18,7 +18,6 @@ COLORCODES = [
 
 COLORS = {i+1: "\033[{}m{} \033[0m".format(x, i+1) for i, x in enumerate(COLORCODES)}
 WIDTH = 4
-MAXTRIES = 10
 
 
 def allcolors():
@@ -30,6 +29,42 @@ def allcolors():
             for x in range(30, 38):
                 sys.stdout.write('\033[{};{};{}m'.format(y, x, bold) + '{};{};{}'.format(y,x,bold) + reset)
         print()
+
+
+def tuple_intersection(t1, t2):
+    i = 0        
+    t2 = list(t2)
+    for x in t1:
+        if x in t2:
+            t2.remove(x)
+            i += 1
+
+    return i 
+
+
+def tuple_match(t1, t2):
+    assert len(t1) == len(t2)
+
+    found = 0
+    for i, v in enumerate(t1):
+        if t2[i] == v:
+            found += 1
+
+    return found
+
+
+def permute(lol):
+    # lol = list of lists
+    if not isinstance(lol[0], list):
+        lol[0] = list(lol[0])
+        
+    random.shuffle(lol[0])
+    for x in lol[0]:
+        if lol[1:]:
+            for y in permute(lol[1:]):
+                yield [x] + y
+        else:
+            yield [x]
 
 
 class Game:
@@ -57,25 +92,12 @@ class Game:
     @staticmethod
     def verdict(combo1, combo2):
         """ Return number of red (right color, right position) and white (just right color) """
-        x = list(combo1.seq)
-        y = list(combo2.seq)
 
-        red = white = 0
-
-        for i, n in enumerate(x):
-            if x[i] == y[i]:
-                red += 1
-                x[i] = y[i] = None
-
-        x_colors = [n for n in x if n is not None]
-        y_colors = [n for n in y if n is not None]
-
-        for c in x_colors:
-            if c in y_colors:
-                white += 1
-                y_colors.remove(c)
+        red = tuple_match(combo1.seq, combo2.seq)
+        white = tuple_intersection(combo1.seq, combo2.seq) - red
 
         return red, white
+
 
 class Combo:
 
