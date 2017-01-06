@@ -3,6 +3,8 @@
 A simulator / interactive client for the traditional board game. 
 Written in an offline holiday to satisfy my curiosity.
 
+![](https://buq.eu/screenshots/AtyIt6QU.png)
+
 # Usage
 
 ```
